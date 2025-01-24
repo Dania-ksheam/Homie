@@ -20,7 +20,7 @@ dependencies:
   flag: ^7.0.0
   image_picker: 0.8.7+3
  
-  #image_picker: ^0.8.7+3
+  image_picker: ^0.8.7+3
   #google_maps_flutter: ^2.0.9
   #google_maps_flutter: ^2.10.0
    # Add Google Maps Flutter package
