@@ -1,8 +1,7 @@
-//import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
-//import 'package:flutter/material.dart';
-//import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class Template extends StatefulWidget {
   final String categoryName;
@@ -22,7 +21,7 @@ class _TemplateState extends State<Template> {
   TimeOfDay? _selectedTime;
   String? _selectedEducationLevel;
   int? _selectedGrade;
-  //File? _selectedImage;
+  File? _selectedImage;
 
   // Education levels and grade ranges
   final List<String> educationLevels = ['Elementary', 'Middle School', 'High School'];
@@ -76,16 +75,16 @@ class _TemplateState extends State<Template> {
   }
 
   // Pick an image
-  // Future<void> _pickImage() async {
-  //   final ImagePicker picker = ImagePicker();
-  //   final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-  //   if (image != null) {
-  //     setState(() {
-  //       _selectedImage = File(image.path);
-  //     });
-  //   }
-  // }
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path);
+      });
+    }
+  }
 
   // Date picker
   Future<void> _pickDate() async {
@@ -265,27 +264,27 @@ class _TemplateState extends State<Template> {
             ),
             const SizedBox(height: 20),
 
-            // Image Picker (commented out to avoid errors)
+            // Image Picker
             if (widget.categoryName == 'Plumbing' || widget.categoryName == 'Electrician') ...[
               const Text("Upload Image:", style: TextStyle(fontSize: 16)),
               const SizedBox(height: 10),
-              // GestureDetector(
-              //   onTap: _pickImage,
-              //   child: _selectedImage != null
-              //       ? Image.file(
-              //           _selectedImage!,
-              //           height: 150,
-              //           width: double.infinity,
-              //           fit: BoxFit.cover,
-              //         )
-              //       : Container(
-              //           height: 150,
-              //           width: double.infinity,
-              //           color: Colors.grey[300],
-              //           child: const Icon(Icons.camera_alt, size: 50, color: Colors.grey),
-              //         ),
-              // ),
-              // const SizedBox(height: 20),
+              GestureDetector(
+                onTap: _pickImage,
+                child: _selectedImage != null
+                    ? Image.file(
+                        _selectedImage!,
+                        height: 150,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        height: 150,
+                        width: double.infinity,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.camera_alt, size: 50, color: Colors.grey),
+                      ),
+              ),
+              const SizedBox(height: 20),
             ],
 
             // Submit Button
