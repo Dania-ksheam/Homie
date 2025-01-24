@@ -1234,7 +1234,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:test/screens/SplashScreen.dart';
+import 'package:test/screens/Template%20.dart';
 import 'package:test/theme.dart';  // Import your theme
 
 void main() {
@@ -1284,7 +1284,7 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       theme: appTheme,
-      home: SplashScreen(),
+      home: Template(categoryName: 'Plumbing')
     );
   }
 }

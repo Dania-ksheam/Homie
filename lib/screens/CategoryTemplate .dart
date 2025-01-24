@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 class CategoryTemplate extends StatelessWidget {
   final String categoryName;
 
