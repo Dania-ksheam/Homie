@@ -55,6 +55,7 @@ class _MyAppState extends State<MyApp> {
       ],
       theme: appTheme,
       home: Template(categoryName: 'Plumbing',),
+      //test
     );
   }
 }
