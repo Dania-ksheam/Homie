@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/extantion.dart'; // Localization extension
-import 'Venderhome.dart'; // Vendor Home Screen
+import 'vendermain.dart'; // Vendor Home Screen
 import 'MainScreen.dart'; // Main Screen
 import 'UserTypeSelectionScreen.dart'; // Sign Up Screen (you need to create this)
 
@@ -52,7 +52,7 @@ class _SignInScreenState extends State<SignInScreen> {
         if (message.contains('Vendor')) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => VendorHomeScreen()),
+            MaterialPageRoute(builder: (context) => VendorMainScreen(userId: userId)),
           );
         } else if (message.contains('User')) {
           Navigator.pushReplacement(
@@ -102,7 +102,8 @@ class _SignInScreenState extends State<SignInScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset('assets/logo.png', height: 150), // Logo Image
+             Image.asset('images/Homie_logo.png', height: 150), // Logo Image
+
               const SizedBox(height: 30),
               TextField(
                 controller: _emailController,

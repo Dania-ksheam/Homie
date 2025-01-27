@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       theme: appTheme,
-      home: Template(categoryName: 'Plumbing',),
+      home: SplashScreen(),
       //test
     );
   }

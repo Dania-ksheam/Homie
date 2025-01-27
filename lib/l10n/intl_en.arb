@@ -75,5 +75,6 @@
   "fill_all_fields": "Fill all fields",
   "unexpected_response": "Unexpected Response",
   "failedToUpdateProfile":"Failed to update profile",
-  "profileUpdatedSuccessfully":"Profile updated success fully"
+  "profileUpdatedSuccessfully":"Profile updated success fully",
+   "comments": "Comments"
 }

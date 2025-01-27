@@ -75,5 +75,6 @@
   "fill_all_fields": "يرجى ملء جميع الحقول",
   "unexpected_response": "استجابة غير متوقعة",
   "failedToUpdateProfile": "فشل في تحديث الملف الشخصي",
-  "profileUpdatedSuccessfully": "تم تحديث الملف الشخصي بنجاح"
+  "profileUpdatedSuccessfully": "تم تحديث الملف الشخصي بنجاح",
+  "comments": "التعليقات"
 }
