@@ -128,3 +128,19 @@
 // }
 
 // void main() => runApp(MaterialApp(home: CommentsScreen()));
+import 'package:flutter/material.dart';
+
+class VendorComments extends StatelessWidget {
+  const VendorComments({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: const Text(
+        'Vendor Orders Screen',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 20),
+      ),
+    );
+  }
+}
