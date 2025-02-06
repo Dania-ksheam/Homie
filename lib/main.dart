@@ -1,7 +1,7 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
+//import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:test/screens/SplashScreen.dart';
 import 'package:test/screens/Template%20.dart';
@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
       locale: _locale,
       supportedLocales: const [Locale('en'), Locale('ar')],
       localizationsDelegates: const [
-        AppLocalizations.delegate,
+      //  AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
