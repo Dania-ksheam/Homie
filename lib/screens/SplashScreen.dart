@@ -1,7 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async';
-import 'sigin_screen.dart'; // Ensure this import is correct
+import 'login_screen.dart'; // Ensure this import is correct
 import 'dart:io';
 import 'user_home.dart';
 class SplashScreen extends StatefulWidget {
@@ -73,10 +74,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   angle: _rotateAnimation.value * 2 * 3.14159,
                   child: Transform.scale(
                     scale: _bounceAnimation.value,
-                    child:    Image.asset('images/Homie_logo.png',// Ensure the asset path is correct
-                      width: 200,
-                      height: 200,
-                    ),
+                    child:   SvgPicture.asset('images/g8.svg', height: 200, width: 200,),
                   ),
                 );
               },

@@ -4,7 +4,7 @@
 // import 'profile_screen.dart';
 // import 'orders_screen.dart';
 // import 'package:test/extantion.dart'; // Your localization extension
-// import 'sigin_screen.dart'; // Correct the import for SignInScreen
+// import 'login_screen.dart'; // Correct the import for SignInScreen
 
 // class MainScreen extends StatefulWidget {
 //   final String userId; // Accept userId as a parameter
@@ -113,10 +113,11 @@
 //   }
 // }
 import 'package:flutter/material.dart';
+import 'package:test/theme.dart';
 import 'user_home.dart';
 import 'profile_screen.dart';
 import 'orders_screen.dart';
-import 'sigin_screen.dart';
+import 'login_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final String userId;
@@ -182,14 +183,14 @@ class _MainScreenState extends State<MainScreen> {
       body: _screens[_selectedIndex],
       bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
+          topLeft: Radius.circular(0),
+          topRight: Radius.circular(0),
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           backgroundColor: Theme.of(context).primaryColor,
-          selectedItemColor: const Color.fromARGB(255, 165, 144, 144),
+          selectedItemColor: AppColors.accentColor,
           unselectedItemColor: Colors.white,
           items: [
             BottomNavigationBarItem(

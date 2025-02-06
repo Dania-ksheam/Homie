@@ -2590,7 +2590,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               Text(
                 "Top Rated",
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -2614,7 +2614,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               Text(
                 "Categories",
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
