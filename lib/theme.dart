@@ -60,12 +60,12 @@ useMaterial3: true,
     ),
     bodyMedium: TextStyle(
       fontSize: 14,
-      color: AppColors.textSecondaryColor,
+      color: AppColors.textPrimaryColor,
     ),
     labelLarge: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
-      color: AppColors.textSecondaryColor,
+      color: AppColors.primaryColor,
     ),
     titleLarge: TextStyle(
       fontSize: 18,
@@ -75,8 +75,8 @@ useMaterial3: true,
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.accentColor,
-      foregroundColor: Colors.black,
+      backgroundColor: AppColors.primaryColor,
+      foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
       ),
@@ -88,7 +88,7 @@ useMaterial3: true,
   ),
   appBarTheme: AppBarTheme(
     backgroundColor: AppColors.primaryColor,
-    elevation: 4,
+    elevation: 0,
     titleTextStyle: TextStyle(
       color: Colors.white,
       fontSize: 20,
@@ -97,7 +97,7 @@ useMaterial3: true,
     iconTheme: IconThemeData(color: Colors.white),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: AppColors.accentColor,
+    backgroundColor: AppColors.primaryColor,
     foregroundColor: Colors.black,
   ),
   inputDecorationTheme: InputDecorationTheme(
@@ -113,7 +113,7 @@ useMaterial3: true,
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8.0),
-      borderSide: BorderSide(color: AppColors.accentColor),
+      borderSide: BorderSide(color: AppColors.primaryColor),
     ),
     labelStyle: TextStyle(
       color: AppColors.textSecondaryColor,

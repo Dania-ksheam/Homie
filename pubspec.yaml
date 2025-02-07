@@ -20,6 +20,7 @@ dependencies:
   flag: ^7.0.0
   image_picker: 0.8.7+3
   cached_network_image: ^3.2.3 # For efficient image caching
+  flutter_svg: ^2.0.17
 
   #google_maps_flutter: ^2.0.9
   #google_maps_flutter: ^2.10.0
@@ -36,11 +37,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - images/Homie_logo.png
-    - images/Teaching.jpg
-    - images/plumper.jpg
-    - images/Cleaning.jpg
-    - images/electrion.jpg
+    - images/
     - lib/l10n/  # For localization files
 
   generate: true  # Enable code generation (for localization files)
