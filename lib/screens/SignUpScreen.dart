@@ -290,7 +290,7 @@ void _fetchCategories() async {
                     ],
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.037),
                 Text("Sign up",
                   style: TextStyle(
                     fontSize: 30,
