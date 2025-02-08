@@ -7,14 +7,14 @@ import 'vendermain.dart';
 import 'MainScreen.dart';
 import 'UserTypeSelectionScreen.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class LogInScreen extends StatefulWidget {
+  const LogInScreen({super.key});
 
   @override
-  _SignInScreenState createState() => _SignInScreenState();
+  _LogInScreenState createState() => _LogInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _LogInScreenState extends State<LogInScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
