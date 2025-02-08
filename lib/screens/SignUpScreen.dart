@@ -290,7 +290,7 @@ void _fetchCategories() async {
                     ],
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.037),
                 Text("Sign up",
                   style: TextStyle(
                     fontSize: 30,
@@ -300,13 +300,16 @@ void _fetchCategories() async {
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
 
-                Text("As a service provider you can offer ur services and get paid for them",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textPrimaryColor
-                  ),
-                  ),
+               Text(
+                 widget.userType == 1
+                   ? "As a service provider you can offer your services and get paid for them"
+                   : "As a client you can request a service provider to help you",
+                 style: TextStyle(
+                   fontSize: 16,
+                   fontWeight: FontWeight.w400,
+                   color: AppColors.textPrimaryColor,
+                 ),
+               ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.07),
 
                 GestureDetector(
