@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 
+import '../theme.dart';
+
 class VendorProfile extends StatefulWidget {
   final String userId;
   final String vendorId;
@@ -173,7 +175,15 @@ class _VendorProfileState extends State<VendorProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profile"),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 8,bottom: 2),
+          child: Text("Profile",style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryColor,
+          ),),
+        ),
+        backgroundColor: Colors.transparent,
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
@@ -191,14 +201,14 @@ class _VendorProfileState extends State<VendorProfile> {
                               ? FileImage(File(_profileImage!))
                               : null,
                           child: _profileImage == null
-                              ? Icon(Icons.person, size: 50)
+                              ? Icon(Icons.person, size: 50,color: AppColors.backgroundColor,)
                               : null,
                         ),
                         Positioned(
                           bottom: 0,
                           right: 0,
                           child: IconButton(
-                            icon: Icon(Icons.add_circle, color: Colors.blue),
+                            icon: Icon(Icons.add_circle, color: AppColors.backgroundColor),
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,

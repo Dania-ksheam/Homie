@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../theme.dart';
+
 
 
 class MyApp extends StatelessWidget {
@@ -88,7 +90,15 @@ class _VendorCommentsScreenState extends State<VendorCommentsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vendor Comments'),
+        title:  Padding(
+          padding: const EdgeInsets.only(top: 8,bottom: 2),
+          child: Text('Vendor Comments',style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryColor,
+          ),),
+        ),
+        backgroundColor: Colors.transparent,
       ),
       body: FutureBuilder<List<Comment>>(
         future: comments,
@@ -160,28 +170,52 @@ class CommentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      child: ListTile(
-        leading: imageUrl != null
-            ? CircleAvatar(
-                backgroundImage: NetworkImage(imageUrl!),
-              )
-            : const CircleAvatar(
-                child: Icon(Icons.person),
-              ),
-        title: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(email),
-            Text(content ?? 'No content'),
-            if (rating != null) Text('Rating: $rating'),
-          ],
-        ),
-      ),
+    return ListTile(
+      leading: imageUrl != null
+          ? CircleAvatar(
+              backgroundImage: NetworkImage(imageUrl!),
+            )
+          : const CircleAvatar(
+              child: Icon(Icons.person),
+            ),
+      title: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.grey[200], // Background color of the bubble
+            borderRadius: BorderRadius.circular(12), // Rounded corners
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0), // Padding inside the bubble
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        content ?? 'No content',
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        maxLines: 3,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 10),
+                if (rating != null)
+                  Row(
+                    children: [
+                      Text('Rating: $rating'),
+                      Icon(Icons.star, color: Colors.yellow),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        )
     );
   }
 }

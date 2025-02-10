@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       theme: appTheme,
-      home: MainScreen(userId: "0"),
+      home: SplashScreen(),
       //test
     );
   }

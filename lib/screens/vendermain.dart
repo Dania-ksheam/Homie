@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:test/theme.dart';
 import 'VenderProfile.dart'; // Corrected import for VenderProfile
 //import 'vendorOrders.dart'; // Corrected import for vendorOrders
 import 'VenderComments.dart'; // Corrected import for VenderComments
@@ -127,19 +129,28 @@ class _VendorMainScreenState extends State<VendorMainScreen> {
     return Scaffold(
       key: _scaffoldKey, // Set the scaffold key here
       appBar: AppBar(
-        title: Text(
-          _getTitles()[_selectedIndex],
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+        // title: Text(
+        //   _getTitles()[_selectedIndex],
+        //   style: const TextStyle(
+        //     fontWeight: FontWeight.bold,
+        //     color: Colors.white,
+        //   ),
+        // ),
+        backgroundColor: AppColors.backgroundColor,
+        flexibleSpace: Padding(
+          padding: const EdgeInsets.only(top: 25),
+          child: Center(
+            child: SvgPicture.asset(
+              'images/g8.svg',
+              height: 80,
+            ),
           ),
         ),
-        backgroundColor: Theme.of(context).primaryColor,
         actions: [
           if (_selectedIndex == 0) ...[
             // Show logout only on profile screen
             IconButton(
-              icon: const Icon(Icons.logout),
+              icon: const Icon(Icons.logout,color: AppColors.primaryColor,),
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
@@ -151,23 +162,30 @@ class _VendorMainScreenState extends State<VendorMainScreen> {
               tooltip: 'Log Out', // Use hardcoded string for logout
             ),
             IconButton(
-              icon: const Icon(Icons.language),
+              icon: const Icon(Icons.language,color: AppColors.primaryColor,),
               onPressed: _changeLocale,
             ),
           ],
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(4.0),
+          child: Container(
+            color: Colors.grey[300],
+            height: 1.5,
+          ),
+        ),
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
+          topLeft: Radius.circular(0),
+          topRight: Radius.circular(0),
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           backgroundColor: Theme.of(context).primaryColor,
-          selectedItemColor: const Color.fromARGB(255, 165, 144, 144),
+          selectedItemColor: AppColors.accentColor,
           unselectedItemColor: Colors.white,
           items: const [
             BottomNavigationBarItem(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../theme.dart';
+
 class Mission {
   final String id;
   final String name;
@@ -181,25 +183,35 @@ class _MissionsScreenState extends State<MissionsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Missions'),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 8,bottom: 2),
+          child: Text('Missions',style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryColor,
+          ),),
+        ),
+        backgroundColor: Colors.transparent,
       ),
       body: Column(
         children: [
           // Filter bar
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Row(
+            child:Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                for (var state in ['All', 'Pending', 'Scheduled', 'Completed', 'Cancelled'])
+                for (var state in ['All', 'Pending', 'Scheduled', 'Completed', 'Cancelled']) ...[
                   FilterButton(
                     label: state,
                     isSelected: filter == state,
                     onTap: () => updateFilter(state),
                   ),
+                ],
               ],
-            ),
+            )
           ),
+          SizedBox(height: 4,),
           // Missions list
           Expanded(
             child: ListView.builder(
@@ -207,17 +219,20 @@ class _MissionsScreenState extends State<MissionsScreen> {
               itemBuilder: (context, index) {
                 final mission = missions[index];
                 print('Mission ID in list: ${mission.id}');
-                return MissionCard(
-                  mission: mission,
-                  onTap: () {
-                    print('Tapped mission ID: ${mission.id}');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MissionDetailScreen(missionId: mission.id, vendorId: widget.vendorId), // Pass missionId and vendorId
-                      ),
-                    );
-                  },
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 3),
+                  child: MissionCard(
+                    mission: mission,
+                    onTap: () {
+                      print('Tapped mission ID: ${mission.id}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MissionDetailScreen(missionId: mission.id, vendorId: widget.vendorId), // Pass missionId and vendorId
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),
@@ -240,14 +255,24 @@ class FilterButton extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Chip(
-        label: Text(label),
-        backgroundColor: isSelected ? Colors.blue : Colors.grey[300],
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : Colors.black,
+    return Padding(
+      padding: const EdgeInsets.only(left: 16),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Chip(
+          label: Text(label),
+          backgroundColor: isSelected ? AppColors.primaryColor : Colors.grey[300],
+          labelStyle: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey[600],
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(
+              color: isSelected ? AppColors.primaryColor : Colors.grey[600]!,
+            ),
+          ),
         ),
       ),
     );
@@ -346,7 +371,21 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
     print('Mission ID in detail screen: ${widget.missionId}');
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mission Details'),
+        title: Text(
+          'Mission Details',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryColor,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppColors.primaryColor),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -358,16 +397,25 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                 controller: _noteController,
                 decoration: InputDecoration(labelText: 'Add Note'),
               ),
+              SizedBox(height: 10,),
               TextField(
                 controller: _priceController,
                 decoration: InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
               ),
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _submitOffer,
-                child: Text('Send'),
+              SizedBox(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.07,
+                child: ElevatedButton(
+                  onPressed: _submitOffer,
+                  child: Text('Send',style: TextStyle(
+                    fontSize: 18,
+
+                  ),),
+                ),
               ),
+
             ],
           ),
         ),

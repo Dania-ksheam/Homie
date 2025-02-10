@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../theme.dart';
 import 'vendor_details_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -42,46 +44,80 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'User Missions',
-          style: TextStyle(color: Colors.black),
+        backgroundColor: AppColors.backgroundColor,
+        flexibleSpace: Padding(
+          padding: const EdgeInsets.only(top: 25),
+          child: Center(
+            child: SvgPicture.asset(
+              'images/g8.svg',
+              height: 80,
+            ),
+          ),
         ),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 1,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
-          tabs: const [
-            Tab(text: 'All Missions'),
-            Tab(text: 'Scheduled Missions'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(4.0),
+          child: Container(
+            color: Colors.grey[300],
+            height: 1.5,
+          ),
         ),
       ),
-      body: FutureBuilder<List<Mission>>(
-        future: missions,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No missions available'));
-          } else {
-            final allMissions = snapshot.data!;
-            final scheduledMissions = allMissions.where((mission) => mission.state == MissionState.Scheduled).toList();
-
-            return TabBarView(
-              controller: _tabController,
+      body: Column(
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                _buildMissionList(allMissions),
-                _buildMissionList(scheduledMissions),
+                Text(
+                  "User Missions",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
               ],
-            );
-          }
-        },
+            ),
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.009),
+          TabBar(
+            controller: _tabController,
+            labelColor: Colors.blue,
+            unselectedLabelColor: Colors.grey,
+            indicatorColor: Colors.blue,
+            tabs: const [
+              Tab(text: 'All Missions'),
+              Tab(text: 'Scheduled Missions'),
+            ],
+          ),
+          Expanded(
+            child: FutureBuilder<List<Mission>>(
+              future: missions,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No missions available'));
+                } else {
+                  final allMissions = snapshot.data!;
+                  final scheduledMissions = allMissions.where((mission) => mission.state == MissionState.Scheduled).toList();
+            
+                  return TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildMissionList(allMissions),
+                      _buildMissionList(scheduledMissions),
+                    ],
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -231,13 +231,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "${_titles[_selectedIndex]}+new mohey edit",
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryColor,
-          ),
-        ),
         backgroundColor: AppColors.backgroundColor,
         flexibleSpace: Padding(
           padding: const EdgeInsets.only(top: 25),
@@ -249,7 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         actions: [
-          if (_selectedIndex == 1) ...[
+          if (_selectedIndex == 0) ...[
             IconButton(
               icon: const Icon(Icons.logout, color: AppColors.primaryColor),
               onPressed: () {
@@ -280,6 +273,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Text("Profile",style: TextStyle(
+                //   fontSize: 24,
+                //   fontWeight: FontWeight.bold,
+                //   color: AppColors.primaryColor,
+                // ),),
                 if (_selectedImage != null)
                   Center(
                     child: CircleAvatar(

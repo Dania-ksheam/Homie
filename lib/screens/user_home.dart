@@ -152,22 +152,26 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return Stack(
       alignment: Alignment.bottomLeft,
       children: [
-        Container(
-          height: 200,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(imagePath),
-              fit: BoxFit.cover,
+        Material(
+          elevation: 3,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(imagePath),
+                fit: BoxFit.cover,
+              ),
+              borderRadius: BorderRadius.circular(20),
             ),
-            borderRadius: BorderRadius.circular(20),
           ),
         ),
         Container(
           height: 50,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
+            color: AppColors.backgroundColor,
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(20),
               bottomRight: Radius.circular(20),
@@ -178,7 +182,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           child: Text(
             label,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.primaryColor,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),

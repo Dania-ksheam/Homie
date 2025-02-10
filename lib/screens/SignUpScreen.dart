@@ -9,6 +9,7 @@ import 'package:flag/flag.dart';
 import 'package:path/path.dart' as path;
 
 import '../theme.dart';
+import 'login_screen.dart';
 
 // Define the GenderType enum
 enum GenderType { male, female }
@@ -238,8 +239,10 @@ void _fetchCategories() async {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Account created successfully!")),
             );
-            Navigator.pop(context);
-          }
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LogInScreen()),
+            );          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Error: ${response.body}")),
