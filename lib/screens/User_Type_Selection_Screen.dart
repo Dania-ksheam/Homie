@@ -56,7 +56,7 @@ class UserTypeSelectionScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-Spacer(),
+             Spacer(),
             // Client Button
             SizedBox(
               width: double.infinity,
@@ -67,23 +67,14 @@ Spacer(),
                     context,
                     MaterialPageRoute(
                       builder: (context) => SignUpScreen(userType: 0),
-                    ),
-                  );
-                },
-                child:
-                    Text("I am a Client",style: TextStyle(
-                      fontSize: 18,
-
-                    ),), // Removed localization
-
-
-              ),
-            ),
-
+                    ),);},
+                child: Text("I am a Client",style: TextStyle(
+                      fontSize: 18,  ),), // Removed localization
+                      ),),
 SizedBox(
   height: MediaQuery.of(context).size.height * 0.02,
-),            // Service Provider Button
-      SizedBox(
+),     // Service Provider
+ SizedBox(
         width: double.infinity,
         height: MediaQuery.of(context).size.height * 0.08,
         child: OutlinedButton(
