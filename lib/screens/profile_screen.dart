@@ -221,8 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
   }
-
-  @override
+@override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
@@ -252,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           if (_selectedIndex == 1) ...[
             IconButton(
-              icon: const Icon(Icons.logout,color: AppColors.primaryColor,),
+              icon: const Icon(Icons.logout, color: AppColors.primaryColor),
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
@@ -288,7 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundImage: FileImage(_selectedImage!),
                     ),
                   )
-                else if (userData!['image'] != null)
+                else if (userData != null && userData!['image'] != null)
                   Center(
                     child: CircleAvatar(
                       radius: 50,
