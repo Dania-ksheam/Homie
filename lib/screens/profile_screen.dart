@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +5,7 @@ import 'dart:convert';
 import 'package:flag/flag.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
 import 'dart:io';
 
 import '../theme.dart';
@@ -28,21 +28,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
   late final TextEditingController _ageController;
+  late final TextEditingController _addressController;
+  late final TextEditingController _locationController;
   late final TextEditingController _passwordController;
 
   // State variables
-  String selectedAddress = 'Tripoli'; // Default value for dropdown
   String selectedCountryCode = '+218'; // Default country code
   String selectedCountry = 'LY'; // Default country
   String selectedGender = 'Male'; // Default gender
   bool isLoading = true;
   File? _selectedImage;
+  Location _location = Location();
 
   Map<String, dynamic>? userData;
-
-  // Add these variables
-  int _selectedIndex = 0;
-  final List<String> _titles = ["Home", "Profile", "Orders"];
 
   @override
   void initState() {
@@ -51,11 +49,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _emailController = TextEditingController();
     _phoneController = TextEditingController();
     _ageController = TextEditingController();
+    _addressController = TextEditingController();
+    _locationController = TextEditingController();
     _passwordController = TextEditingController();
     _fetchUserData();
   }
 
-  /// Fetch user data from the backend API
   Future<void> _fetchUserData() async {
     final url = 'https://192.168.0.109:7127/api/User/${widget.userId}';
     try {
@@ -69,10 +68,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _phoneController.text =
               userData!['phone']?.replaceFirst(selectedCountryCode, '') ?? '';
           _ageController.text = userData!['age']?.toString() ?? '';
-          selectedAddress = (userData!['userAddress'] ?? 'Tripoli').trim();
-          selectedGender = (userData!['gender'] ?? 'Male').trim();
+          _addressController.text = userData!['userAddress'] ?? '';
+          _locationController.text = userData!['location'] ?? '';
+          selectedGender = userData!['gender'] == 1 ? 'Male' : 'Female';
           isLoading = false;
         });
+        print('User data fetched successfully: $userData');
       } else {
         throw Exception('Failed to fetch user data');
       }
@@ -84,7 +85,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  /// Pick an image from the gallery
+  Future<void> _getCurrentLocation() async {
+    final LocationData locationData = await _location.getLocation();
+    _locationController.text =
+        "Lat: ${locationData.latitude}, Long: ${locationData.longitude}";
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Location updated!"),
+      ),
+    );
+    print('Current location: ${_locationController.text}');
+  }
+
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -93,17 +105,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _selectedImage = File(image.path);
       });
+      print('Image selected: $_selectedImage');
     }
   }
 
-  /// Remove the profile image
   void _removeImage() {
     setState(() {
       _selectedImage = null;
     });
+    print('Image removed');
   }
 
-  /// Show a dialog to choose between changing or deleting the profile picture
   void _showImageOptions() {
     showDialog(
       context: context,
@@ -132,7 +144,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  /// Show a dialog to change the password
   void _showChangePasswordDialog() {
     final _newPasswordController = TextEditingController();
     final _confirmPasswordController = TextEditingController();
@@ -164,10 +175,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _confirmPasswordController.text) {
                   _passwordController.text = _newPasswordController.text;
                   Navigator.of(context).pop();
+                  print('Password changed successfully');
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Passwords do not match')),
                   );
+                  print('Passwords do not match');
                 }
               },
               child: const Text('Save'),
@@ -178,7 +191,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  /// Save updated profile data to the backend
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate() && userData != null) {
       final updatedData = Map<String, dynamic>.from(userData!);
@@ -186,18 +198,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
       updatedData['email'] = _emailController.text;
       updatedData['phone'] = '$selectedCountryCode${_phoneController.text}';
       updatedData['age'] = int.tryParse(_ageController.text) ?? 0;
-      updatedData['userAddress'] = selectedAddress;
-      updatedData['gender'] = selectedGender;
+      updatedData['userAddress'] = _addressController.text;
+      updatedData['location'] = _locationController.text;
+      updatedData['gender'] = selectedGender == 'Male' ? 1 : 0;
+      updatedData['type'] = 0;
 
       if (_passwordController.text.isNotEmpty) {
         updatedData['password'] = _passwordController.text;
+      } else {
+        updatedData['password'] = userData!['password'];
       }
 
+      if (_selectedImage != null) {
+        final bytes = await _selectedImage!.readAsBytes();
+        updatedData['image'] = base64Encode(bytes);
+      } else {
+        updatedData['image'] = userData!['image'];
+      }
+
+      print('Updated user data: $updatedData');
       await _updateUserProfile(updatedData);
     }
   }
 
-  /// Send the updated user data to the backend API
   Future<void> _updateUserProfile(Map<String, dynamic> data) async {
     final url = 'https://192.168.0.109:7127/api/User/${widget.userId}';
     try {
@@ -211,7 +234,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
         );
+        print('Profile updated successfully');
       } else {
+        print('Failed to update profile: ${response.body}');
         throw Exception('Failed to update profile');
       }
     } catch (error) {
@@ -221,7 +246,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
   }
-@override
+
+  @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
@@ -242,20 +268,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         actions: [
-          if (_selectedIndex == 0) ...[
-            IconButton(
-              icon: const Icon(Icons.logout, color: AppColors.primaryColor),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LogInScreen(),
-                  ),
-                );
-              },
-              tooltip: "Log Out",
-            ),
-          ],
+          IconButton(
+            icon: const Icon(Icons.logout, color: AppColors.primaryColor),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LogInScreen(),
+                ),
+              );
+            },
+            tooltip: "Log Out",
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4.0),
@@ -273,11 +297,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Text("Profile",style: TextStyle(
-                //   fontSize: 24,
-                //   fontWeight: FontWeight.bold,
-                //   color: AppColors.primaryColor,
-                // ),),
                 if (_selectedImage != null)
                   Center(
                     child: CircleAvatar(
@@ -293,7 +312,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   )
                 else
-                  Center(
+                  const Center(
                     child: CircleAvatar(
                       radius: 50,
                       child: Icon(Icons.person),
@@ -388,6 +407,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: const InputDecoration(labelText: 'Gender'),
                 ),
                 const SizedBox(height: 16),
+                TextFormField(
+                  controller: _addressController,
+                  decoration: const InputDecoration(labelText: 'Address'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Address cannot be empty';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _locationController,
+                        decoration: InputDecoration(
+                          labelText: 'Location',
+                        ),
+                        readOnly: true,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.my_location),
+                      onPressed: _getCurrentLocation,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
                 GestureDetector(
                   onTap: _showChangePasswordDialog,
                   child: const Text(
@@ -418,6 +466,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _ageController.dispose();
+    _addressController.dispose();
+    _locationController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
