@@ -9,6 +9,7 @@ import 'package:location/location.dart';
 import 'dart:io';
 
 import '../theme.dart';
+import '../widgets/image_base.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -38,6 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String selectedGender = 'Male'; // Default gender
   bool isLoading = true;
   File? _selectedImage;
+  String? _base64Image; // To store the Base64 encoded image string
   Location _location = Location();
 
   Map<String, dynamic>? userData;
@@ -71,6 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _addressController.text = userData!['userAddress'] ?? '';
           _locationController.text = userData!['location'] ?? '';
           selectedGender = userData!['gender'] == 1 ? 'Male' : 'Female';
+          _base64Image = userData!['image'];
           isLoading = false;
         });
         print('User data fetched successfully: $userData');
@@ -88,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _getCurrentLocation() async {
     final LocationData locationData = await _location.getLocation();
     _locationController.text =
-        "Lat: ${locationData.latitude}, Long: ${locationData.longitude}";
+    "${locationData.latitude},${locationData.longitude}";
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Location updated!"),
@@ -104,6 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (image != null) {
       setState(() {
         _selectedImage = File(image.path);
+        _base64Image = base64Encode(_selectedImage!.readAsBytesSync());
       });
       print('Image selected: $_selectedImage');
     }
@@ -112,6 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _removeImage() {
     setState(() {
       _selectedImage = null;
+      _base64Image = null;
     });
     print('Image removed');
   }
@@ -150,6 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     showDialog(
       context: context,
+      barrierDismissible: false, // Prevents dismissing the dialog by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Change Password'),
@@ -161,6 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'New Password'),
               ),
+              const SizedBox(height: 16),
               TextField(
                 controller: _confirmPasswordController,
                 obscureText: true,
@@ -170,6 +177,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           actions: [
             TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
               onPressed: () {
                 if (_newPasswordController.text ==
                     _confirmPasswordController.text) {
@@ -304,25 +315,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundImage: FileImage(_selectedImage!),
                     ),
                   )
-                else if (userData != null && userData!['image'] != null)
+                else if (_base64Image != null)
                   Center(
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundImage: NetworkImage(userData!['image']),
+                      backgroundImage: _base64Image != null
+                          ? MemoryImage(base64Decode(_base64Image!))
+                          : null,
+                      child: _base64Image == null
+                          ? Icon(Icons.person, size: 50)
+                          : null,
                     ),
                   )
-                else
-                  const Center(
-                    child: CircleAvatar(
-                      radius: 50,
-                      child: Icon(Icons.person),
+                else if (userData != null && userData!['image'] != null)
+                    Center(
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: NetworkImage(userData!['image']),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    const Center(
+                      child: CircleAvatar(
+                        radius: 50,
+                        child: Icon(Icons.person),
+                      ),
                     ),
-                  ),
                 const SizedBox(height: 8),
                 Center(
                   child: ElevatedButton(
                     onPressed: _showImageOptions,
-                    child: const Text('Change/Delete Profile Picture'),
+                    child: const Text('Edit Profile Picture'),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -436,21 +466,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                GestureDetector(
-                  onTap: _showChangePasswordDialog,
-                  child: const Text(
-                    'Change Password',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _saveProfile,
+                    child: const Text('Save Changes'),
                   ),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _saveProfile,
-                  child: const Text('Save Changes'),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: GestureDetector(
+                    onTap: _showChangePasswordDialog,
+                    child: const Text(
+                      'Change Password',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -39,7 +39,8 @@ class _VendorCommentsScreenState extends State<VendorCommentsScreen> {
   }
 
   Future<List<Comment>> fetchComments(String vendorId) async {
-    final response = await http.get(Uri.parse('https://192.168.0.109:7127/api/comments?vendorId=$vendorId'));
+    print(vendorId);
+    final response = await http.get(Uri.parse('https://192.168.0.109:7127/api/Comments/filter?=$vendorId'));
     print(json.decode(response.body));
 
     if (response.statusCode == 200 || response.statusCode == 201) {

@@ -196,6 +196,7 @@
 //     );
 //   }
 // }
+//what did we say about all the comments lol
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -350,6 +351,7 @@ class _LogInScreenState extends State<LogInScreen> {
             TextField(
               controller: _passwordController,
               obscureText: _obscurePassword,
+              maxLength: 20,
               decoration: InputDecoration(
                 labelText: "Password",
                 enabledBorder: OutlineInputBorder(
