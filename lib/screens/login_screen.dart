@@ -34,7 +34,7 @@
 
 //     try {
 //       final response = await http.post(
-//         Uri.parse('https://192.168.0.109:7127/api/Auth/log-in'),
+//         Uri.parse('${AppConfig.baseUrl}:7127/api/Auth/log-in'),
 //         headers: {'Content-Type': 'application/json'},
 //         body: json.encode({
 //           'email': email,
@@ -101,7 +101,6 @@
 //           crossAxisAlignment: CrossAxisAlignment.center,
 //           children: [
 //             SizedBox(height: MediaQuery.of(context).size.height * 0.11),
-
 
 //             SvgPicture.asset('images/g8.svg', height: 200),
 //             Padding(
@@ -205,6 +204,7 @@ import 'package:test/theme.dart';
 import 'vendermain.dart';
 import 'MainScreen.dart';
 import 'User_Type_Selection_Screen.dart';
+import '../config.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -234,7 +234,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://192.168.0.109:7127/api/Auth/log-in'),
+        Uri.parse('${AppConfig.baseUrl}:7127/api/Auth/log-in'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,
@@ -293,7 +293,7 @@ class _LogInScreenState extends State<LogInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     // appBar: AppBar(title: const Text("Sign In")),
+      // appBar: AppBar(title: const Text("Sign In")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -301,8 +301,6 @@ class _LogInScreenState extends State<LogInScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: MediaQuery.of(context).size.height * 0.11),
-
-
             SvgPicture.asset('images/g8.svg', height: 200),
             Padding(
               padding: const EdgeInsets.only(left: 10),
@@ -326,10 +324,9 @@ class _LogInScreenState extends State<LogInScreen> {
                       Text(
                         "To get help for your home services",
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textPrimaryColor
-                        ),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textPrimaryColor),
                       ),
                     ],
                   ),
@@ -383,11 +380,11 @@ class _LogInScreenState extends State<LogInScreen> {
                     : const Text("Log in"),
               ),
             ),
-             SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                 Text("Not a member?"),
+                Text("Not a member?"),
                 TextButton(
                   onPressed: () {
                     Navigator.push(

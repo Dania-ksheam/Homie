@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../theme.dart';
+import '../config.dart';
 
 class VendorDetailsScreen extends StatefulWidget {
   final String userId;
@@ -66,7 +67,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://192.168.0.109:7127/api/Comments/filter?vendorProfileId=$vendorId'),
+            '${AppConfig.baseUrl}:7127/api/Comments/filter?vendorProfileId=$vendorId'),
       );
       print('dania');
       print(json.decode(response.body));
@@ -109,7 +110,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
     print('dania');
     try {
       final response = await http.get(
-        Uri.parse('https://192.168.0.109:7127/api/User/$userId'),
+        Uri.parse('${AppConfig.baseUrl}:7127/api/User/$userId'),
       );
       print(json.decode(response.body));
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -141,7 +142,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://192.168.0.109:7127/api/Comments'),
+        Uri.parse('${AppConfig.baseUrl}:7127/api/Comments'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(comment),
       );
@@ -188,7 +189,8 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
   }
 
   Future<void> _openMap(String location) async {
-    final url = 'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(location)}';
+    final url =
+        'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(location)}';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -237,7 +239,8 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
               const SizedBox(height: 16),
               Text(
                 widget.vendorName,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -432,7 +435,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] ?? '',  // Default empty string if null
+      id: json['id'] ?? '', // Default empty string if null
       name: json['userName'] ?? 'Unknown', // Provide a fallback
       email: json['email'] ?? 'No email', // Provide a fallback
       location: json['location'], // Nullable field

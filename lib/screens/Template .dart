@@ -1,25 +1,32 @@
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../config.dart';
 
 // Define a map to hold the configuration for each category
 final Map<String, List<String>> categoryFieldConfig = {
-  'Plumping/سباكه': [
+  'Plumping/سباكه': ['Date', 'Time', 'Location', 'Details', 'Note', 'Image'],
+  'Cleaning | التنظيف': ['Date', 'Location', 'Details', 'Hour', 'Note'],
+  'Electrical Services | الخدمات الكهربائية': [
     'Date',
     'Time',
     'Location',
     'Details',
-    'Note',
-    'Image'
+    'Image',
+    'Note'
   ],
-  'Cleaning | التنظيف': ['Date', 'Time', 'Location', 'Details','Hour', 'Note'],
-  'Electrical Services | الخدمات الكهربائية': ['Date', 'Time', 'Location', 'Details', 'Image', 'Note'],
-  'Carpentry | النجارة':['Date', 'Time', 'Location', 'Details', 'Image', 'Note'],
-  'teaching/تدريس':['Date', 'Time', 'Location', 'Details', 'Image', 'Note'],
+  'Carpentry | النجارة': [
+    'Date',
+    'Time',
+    'Location',
+    'Details',
+    'Image',
+    'Note'
+  ],
+  'teaching/تدريس': ['Date', 'Time', 'Location', 'Details', 'Image', 'Note'],
   // Add more categories as needed
 };
 
@@ -53,7 +60,11 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
   String? _note; // Add note field
 
   // Education levels and grade ranges
-  final List<String> educationLevels = ['Elementary', 'Middle School', 'High School'];
+  final List<String> educationLevels = [
+    'Elementary',
+    'Middle School',
+    'High School'
+  ];
   final Map<String, List<int>> gradeRanges = {
     'Elementary': List.generate(6, (index) => index + 1), // 1–6
     'Middle School': List.generate(3, (index) => index + 7), // 7–9
@@ -78,9 +89,11 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
         }
       }
 
-      final PermissionStatus permissionGranted = await _location.hasPermission();
+      final PermissionStatus permissionGranted =
+          await _location.hasPermission();
       if (permissionGranted == PermissionStatus.denied) {
-        final PermissionStatus requestedPermission = await _location.requestPermission();
+        final PermissionStatus requestedPermission =
+            await _location.requestPermission();
         if (requestedPermission != PermissionStatus.granted) {
           setState(() {
             _isFetchingLocation = false;
@@ -91,7 +104,8 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
 
       final locationData = await _location.getLocation();
       setState(() {
-        _currentLocation = '${locationData.latitude}, ${locationData.longitude}';
+        _currentLocation =
+            '${locationData.latitude}, ${locationData.longitude}';
         _isFetchingLocation = false;
       });
     } catch (e) {
@@ -147,18 +161,21 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
       'Details': _details,
       'Note': _note, // Add note field
       'Hours': _selectedHours?.toString(), // Convert Hours to string
-      'Mission': 'mission details', // Ensure the mission field is included (Replace with actual mission details)
+      'Mission':
+          'mission details', // Ensure the mission field is included (Replace with actual mission details)
     };
 
     // Ensure all fields are included and set to null if not chosen
     if (!categoryFields.contains('Date')) formData['Day'] = null;
     if (!categoryFields.contains('Hours')) formData['Hours'] = null;
     if (!categoryFields.contains('Location')) formData['Location'] = null;
-    if (!categoryFields.contains('EducationLevel')) formData['EducationLevel'] = null;
+    if (!categoryFields.contains('EducationLevel'))
+      formData['EducationLevel'] = null;
     if (!categoryFields.contains('Grade')) formData['Grade'] = null;
     if (!categoryFields.contains('Details')) formData['Details'] = null;
     //if (!categoryFields.contains('Note')) formData['Note'] = null;
-    if (!categoryFields.contains('Image')) formData.remove('Image'); // Remove Image if not chosen
+    if (!categoryFields.contains('Image'))
+      formData.remove('Image'); // Remove Image if not chosen
 
     if (_selectedImage != null) {
       final bytes = await _selectedImage!.readAsBytes();
@@ -170,29 +187,32 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
 
     // Send the data to the backend
     final response = await http.post(
-      Uri.parse('https://192.168.0.109:7127/api/Mission'),
+      Uri.parse('${AppConfig.baseUrl}:7127/api/Mission'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(formData),
     );
 
-    if (response.statusCode == 201|| response.statusCode == 200) {
-    print('Form submitted successfully!');
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      print('Form submitted successfully!');
       // Show popup message
       print('Form submitted successfully!');
       // Show popup message
       showDialog(
         context: context,
-        barrierDismissible: false, // Prevent closing the dialog by tapping outside
+        barrierDismissible:
+            false, // Prevent closing the dialog by tapping outside
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Order Sent'),
-            content: const Text('Your order has been sent. Please wait a few minutes for the offers to appear.'),
+            content: const Text(
+                'Your order has been sent. Please wait a few minutes for the offers to appear.'),
             actions: <Widget>[
               TextButton(
                 child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
-                  Navigator.of(context).pop(); // Navigate back to the home screen
+                  Navigator.of(context)
+                      .pop(); // Navigate back to the home screen
                 },
               ),
             ],
@@ -201,7 +221,8 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
       );
     } else {
       print('Error submitting form: ${response.statusCode}');
-      print('Response body: ${response.body}'); // Print response body for more details
+      print(
+          'Response body: ${response.body}'); // Print response body for more details
       // Handle error (e.g., show an error message)
     }
   }
@@ -257,7 +278,11 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
                           _selectedHours = value;
                         });
                       },
-                      items: List.generate(24, (index) => index + 1) // Generates a list of integers from 1 to 24
+                      items: List.generate(
+                              24,
+                              (index) =>
+                                  index +
+                                  1) // Generates a list of integers from 1 to 24
                           .map((hour) => DropdownMenuItem(
                                 value: hour,
                                 child: Text(hour.toString()),
@@ -305,7 +330,8 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
             if (categoryFields.contains('EducationLevel'))
               Row(
                 children: [
-                  const Text("Education Level:", style: TextStyle(fontSize: 16)),
+                  const Text("Education Level:",
+                      style: TextStyle(fontSize: 16)),
                   const SizedBox(width: 10),
                   Expanded(
                     child: DropdownButton<String>(
@@ -315,7 +341,8 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
                       onChanged: (value) {
                         setState(() {
                           _selectedEducationLevel = value;
-                          _selectedGrade = null; // Reset grade when education level changes
+                          _selectedGrade =
+                              null; // Reset grade when education level changes
                         });
                       },
                       items: educationLevels
@@ -328,9 +355,11 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
                   ),
                 ],
               ),
-            if (categoryFields.contains('EducationLevel')) const SizedBox(height: 20),
+            if (categoryFields.contains('EducationLevel'))
+              const SizedBox(height: 20),
 
-            if (categoryFields.contains('Grade') && _selectedEducationLevel != null)
+            if (categoryFields.contains('Grade') &&
+                _selectedEducationLevel != null)
               Row(
                 children: [
                   const Text("Grade:", style: TextStyle(fontSize: 16)),
@@ -420,7 +449,8 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
                             height: 150,
                             width: double.infinity,
                             color: Colors.grey[300],
-                            child: const Icon(Icons.camera_alt, size: 50, color: Colors.grey),
+                            child: const Icon(Icons.camera_alt,
+                                size: 50, color: Colors.grey),
                           ),
                   ),
                 ],

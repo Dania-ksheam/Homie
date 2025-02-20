@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:test/theme.dart';
@@ -11,6 +10,7 @@ import 'package:http/http.dart'
 import 'dart:convert'; // Add JSON package for decoding responses
 //import 'MissionsScreen.dart'; // Corrected import for MissionsScreen
 import 'VendorOrders.dart';
+import '../config.dart';
 
 class VendorMainScreen extends StatefulWidget {
   final String userId; // Accept userId as a parameter
@@ -51,7 +51,7 @@ class _VendorMainScreenState extends State<VendorMainScreen> {
   Future<void> _fetchVendorId() async {
     final response = await http.get(
       Uri.parse(
-          'https://192.168.0.109:7127/api/VenderProfile/filter?userId=${widget.userId}'),
+          '${AppConfig.baseUrl}:7127/api/VenderProfile/filter?userId=${widget.userId}'),
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -77,7 +77,7 @@ class _VendorMainScreenState extends State<VendorMainScreen> {
 
   Future<void> _fetchVendorProfile(String vendorId) async {
     final response = await http.get(
-      Uri.parse('https://192.168.0.109:7127/api/VenderProfile/$vendorId'),
+      Uri.parse('${AppConfig.baseUrl}:7127/api/VenderProfile/$vendorId'),
     );
     print(jsonDecode(response.body));
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -92,10 +92,11 @@ class _VendorMainScreenState extends State<VendorMainScreen> {
           ),
           MissionsScreen(
             categoryId: _categoryId!,
-             vendorId: _vendorId!,
-            
+            vendorId: _vendorId!,
           ),
-         VendorCommentsScreen( vendorId: _vendorId!,),
+          VendorCommentsScreen(
+            vendorId: _vendorId!,
+          ),
         ];
       });
     } else {
@@ -150,7 +151,10 @@ class _VendorMainScreenState extends State<VendorMainScreen> {
           if (_selectedIndex == 0) ...[
             // Show logout only on profile screen
             IconButton(
-              icon: const Icon(Icons.logout,color: AppColors.primaryColor,),
+              icon: const Icon(
+                Icons.logout,
+                color: AppColors.primaryColor,
+              ),
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
@@ -162,7 +166,10 @@ class _VendorMainScreenState extends State<VendorMainScreen> {
               tooltip: 'Log Out', // Use hardcoded string for logout
             ),
             IconButton(
-              icon: const Icon(Icons.language,color: AppColors.primaryColor,),
+              icon: const Icon(
+                Icons.language,
+                color: AppColors.primaryColor,
+              ),
               onPressed: _changeLocale,
             ),
           ],
@@ -206,4 +213,3 @@ class _VendorMainScreenState extends State<VendorMainScreen> {
     );
   }
 }
-

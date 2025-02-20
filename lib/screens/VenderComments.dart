@@ -1,11 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../theme.dart';
-
-
+import '../config.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -23,7 +21,8 @@ class MyApp extends StatelessWidget {
 class VendorCommentsScreen extends StatefulWidget {
   final String vendorId;
 
-  const VendorCommentsScreen({required this.vendorId, Key? key}) : super(key: key);
+  const VendorCommentsScreen({required this.vendorId, Key? key})
+      : super(key: key);
 
   @override
   _VendorCommentsScreenState createState() => _VendorCommentsScreenState();
@@ -40,12 +39,14 @@ class _VendorCommentsScreenState extends State<VendorCommentsScreen> {
 
   Future<List<Comment>> fetchComments(String vendorId) async {
     print(vendorId);
-    final response = await http.get(Uri.parse('https://192.168.0.109:7127/api/Comments/filter?=$vendorId'));
+    final response = await http.get(
+        Uri.parse('${AppConfig.baseUrl}:7127/api/Comments/filter?=$vendorId'));
     print(json.decode(response.body));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final List<dynamic> data = json.decode(response.body);
-      if (data.any((json) => json['content'] == 'The comment contains inappropriate content.')) {
+      if (data.any((json) =>
+          json['content'] == 'The comment contains inappropriate content.')) {
         _showInappropriateContentPopup();
         return [];
       }
@@ -56,7 +57,8 @@ class _VendorCommentsScreenState extends State<VendorCommentsScreen> {
   }
 
   Future<User> fetchUserDetails(String userId) async {
-    final response = await http.get(Uri.parse('https://192.168.0.109:7127/api/User/$userId'));
+    final response =
+        await http.get(Uri.parse('${AppConfig.baseUrl}:7127/api/User/$userId'));
     print(json.decode(response.body));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -73,7 +75,8 @@ class _VendorCommentsScreenState extends State<VendorCommentsScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Inappropriate Content'),
-          content: const Text('The comment contains inappropriate content and cannot be displayed.'),
+          content: const Text(
+              'The comment contains inappropriate content and cannot be displayed.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -91,13 +94,16 @@ class _VendorCommentsScreenState extends State<VendorCommentsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Padding(
-          padding: const EdgeInsets.only(top: 8,bottom: 2),
-          child: Text('Vendor Comments',style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryColor,
-          ),),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 2),
+          child: Text(
+            'Vendor Comments',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryColor,
+            ),
+          ),
         ),
         backgroundColor: Colors.transparent,
       ),
@@ -120,7 +126,8 @@ class _VendorCommentsScreenState extends State<VendorCommentsScreen> {
                 return FutureBuilder<User>(
                   future: fetchUserDetails(comment.userId),
                   builder: (context, userSnapshot) {
-                    if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    if (userSnapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return const CircularProgressIndicator();
                     } else if (userSnapshot.hasError) {
                       return ListTile(
@@ -172,14 +179,15 @@ class CommentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: imageUrl != null
-          ? CircleAvatar(
-              backgroundImage: NetworkImage(imageUrl!),
-            )
-          : const CircleAvatar(
-              child: Icon(Icons.person),
-            ),
-      title: Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+        leading: imageUrl != null
+            ? CircleAvatar(
+                backgroundImage: NetworkImage(imageUrl!),
+              )
+            : const CircleAvatar(
+                child: Icon(Icons.person),
+              ),
+        title:
+            Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.grey[200], // Background color of the bubble
@@ -216,8 +224,7 @@ class CommentCard extends StatelessWidget {
               ],
             ),
           ),
-        )
-    );
+        ));
   }
 }
 

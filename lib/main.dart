@@ -56,6 +56,7 @@ class _MyAppState extends State<MyApp> {
       ],
       theme: appTheme,
       home: SplashScreen(),
+      
       //test
     );
   }

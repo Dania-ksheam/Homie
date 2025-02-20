@@ -8,6 +8,7 @@ import 'dart:io';
 
 import '../theme.dart';
 import '../widgets/image_base.dart';
+import '../config.dart';
 
 class VendorProfile extends StatefulWidget {
   final String userId;
@@ -32,7 +33,8 @@ class _VendorProfileState extends State<VendorProfile> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _experienceController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _userAddressController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
@@ -55,14 +57,16 @@ class _VendorProfileState extends State<VendorProfile> {
 
   Future<void> _fetchData() async {
     try {
-      print('Fetching data for userId: ${widget.userId} and vendorId: ${widget.vendorId}');
+      print(
+          'Fetching data for userId: ${widget.userId} and vendorId: ${widget.vendorId}');
 
       final userResponse = await http.get(
-        Uri.parse('https://192.168.0.109:7127/api/user/${widget.userId}'),
+        Uri.parse('${AppConfig.baseUrl}:7127/api/user/${widget.userId}'),
       );
 
       final vendorResponse = await http.get(
-        Uri.parse('https://192.168.0.109:7127/api/venderProfile/${widget.vendorId}'),
+        Uri.parse(
+            '${AppConfig.baseUrl}:7127/api/venderProfile/${widget.vendorId}'),
       );
 
       print('User Response: ${userResponse.body}');
@@ -77,7 +81,8 @@ class _VendorProfileState extends State<VendorProfile> {
           _bioController.text = vendorData['bio'] ?? '';
           _phoneController.text = userData['phone'] ?? '';
           _emailController.text = userData['email'] ?? '';
-          _experienceController.text = vendorData['experience']?.toString() ?? '';
+          _experienceController.text =
+              vendorData['experience']?.toString() ?? '';
           _addressController.text = userData['location'] ?? '';
           _userAddressController.text = userData['userAddress'] ?? '';
           _ageController.text = userData['age']?.toString() ?? '';
@@ -127,19 +132,21 @@ class _VendorProfileState extends State<VendorProfile> {
   Future<void> _getCurrentLocation() async {
     final LocationData locationData = await _location.getLocation();
     _addressController.text =
-    "${locationData.latitude},${locationData.longitude}";
+        "${locationData.latitude},${locationData.longitude}";
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Location updated!"),
       ),
     );
-    print('Current Location: Lat: ${locationData.latitude}, Long: ${locationData.longitude}');
+    print(
+        'Current Location: Lat: ${locationData.latitude}, Long: ${locationData.longitude}');
   }
 
   Future<void> _showChangePasswordDialog() async {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevents dismissing the dialog by tapping outside
+      barrierDismissible:
+          false, // Prevents dismissing the dialog by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Change Password"),
@@ -166,7 +173,8 @@ class _VendorProfileState extends State<VendorProfile> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (_newPasswordController.text != _confirmPasswordController.text) {
+                if (_newPasswordController.text !=
+                    _confirmPasswordController.text) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Passwords do not match")),
                   );
@@ -202,8 +210,12 @@ class _VendorProfileState extends State<VendorProfile> {
         'gender': _selectedGender == 'Male' ? 1 : 0,
         'location': _addressController.text,
         'userAddress': _userAddressController.text,
-        'password': _newPasswordController.text.isNotEmpty ? _newPasswordController.text : _existingPassword,
-        'image': _selectedImage != null ? base64Encode(_selectedImage!.readAsBytesSync()) : _profileImage,
+        'password': _newPasswordController.text.isNotEmpty
+            ? _newPasswordController.text
+            : _existingPassword,
+        'image': _selectedImage != null
+            ? base64Encode(_selectedImage!.readAsBytesSync())
+            : _profileImage,
         'type': 1, // Assuming userType is always Vendor for this screen
       };
 
@@ -220,13 +232,14 @@ class _VendorProfileState extends State<VendorProfile> {
 
       try {
         final userResponse = await http.put(
-          Uri.parse('https://192.168.0.109:7127/api/user/${widget.userId}'),
+          Uri.parse('${AppConfig.baseUrl}:7127/api/user/${widget.userId}'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(userData),
         );
 
         final vendorResponse = await http.put(
-          Uri.parse('https://192.168.0.109:7127/api/venderProfile/${widget.vendorId}'),
+          Uri.parse(
+              '${AppConfig.baseUrl}:7127/api/venderProfile/${widget.vendorId}'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(vendorData),
         );
@@ -236,7 +249,8 @@ class _VendorProfileState extends State<VendorProfile> {
         print('Vendor Response Status: ${vendorResponse.statusCode}');
         print('Vendor Response Body: ${vendorResponse.body}');
 
-        if (userResponse.statusCode == 200 && vendorResponse.statusCode == 204) {
+        if (userResponse.statusCode == 200 &&
+            vendorResponse.statusCode == 204) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Profile updated successfully')),
           );
@@ -245,7 +259,8 @@ class _VendorProfileState extends State<VendorProfile> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to update profile')),
           );
-          print('Failed to update profile: User Response Status: ${userResponse.statusCode}, Vendor Response Status: ${vendorResponse.statusCode}');
+          print(
+              'Failed to update profile: User Response Status: ${userResponse.statusCode}, Vendor Response Status: ${vendorResponse.statusCode}');
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -280,181 +295,186 @@ class _VendorProfileState extends State<VendorProfile> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    if (_selectedImage != null)
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: FileImage(_selectedImage!),
-                      )
-                    else if (_base64Image != null)
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: MemoryImage(base64Decode(_base64Image!)),
-                      )
-                    else if (_profileImage != null)
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(_profileImage!),
-                        )
-                      else
-                        const CircleAvatar(
-                          radius: 50,
-                          child: Icon(Icons.person),
-                        ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: IconButton(
-                        icon: Icon(Icons.add_circle, color: AppColors.backgroundColor),
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Wrap(
-                                children: [
-                                  ListTile(
-                                    leading: Icon(Icons.photo_library),
-                                    title: Text("Change Picture"),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      _pickImage();
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: Icon(Icons.delete),
-                                    title: Text("Delete Picture"),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      _removeImage();
-                                    },
-                                  ),
-                                ],
-                              );
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (_selectedImage != null)
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: FileImage(_selectedImage!),
+                            )
+                          else if (_base64Image != null)
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage:
+                                  MemoryImage(base64Decode(_base64Image!)),
+                            )
+                          else if (_profileImage != null)
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: NetworkImage(_profileImage!),
+                            )
+                          else
+                            const CircleAvatar(
+                              radius: 50,
+                              child: Icon(Icons.person),
+                            ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: IconButton(
+                              icon: Icon(Icons.add_circle,
+                                  color: AppColors.backgroundColor),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Wrap(
+                                      children: [
+                                        ListTile(
+                                          leading: Icon(Icons.photo_library),
+                                          title: Text("Change Picture"),
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                            _pickImage();
+                                          },
+                                        ),
+                                        ListTile(
+                                          leading: Icon(Icons.delete),
+                                          title: Text("Delete Picture"),
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                            _removeImage();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _usernameController.text.isEmpty
+                                ? "Username"
+                                : _usernameController.text,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              setState(() {
+                                _usernameController.text = '';
+                              });
                             },
-                          );
-                        },
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _usernameController.text.isEmpty ? "Username" : _usernameController.text,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () {
-                        setState(() {
-                          _usernameController.text = '';
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _bioController,
-                  maxLines: 4,
-                  decoration: InputDecoration(labelText: "Bio"),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Flag.fromCode(FlagsCode.LY, height: 20, width: 30),
-                    const SizedBox(width: 8),
-                    Text("+218"),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _phoneController,
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _bioController,
+                        maxLines: 4,
+                        decoration: InputDecoration(labelText: "Bio"),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Flag.fromCode(FlagsCode.LY, height: 20, width: 30),
+                          const SizedBox(width: 8),
+                          Text("+218"),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextField(
+                              controller: _phoneController,
+                              keyboardType: TextInputType.number,
+                              maxLength: 9,
+                              decoration: InputDecoration(labelText: "Phone"),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(labelText: "Email"),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _experienceController,
                         keyboardType: TextInputType.number,
-                        maxLength: 9,
-                        decoration: InputDecoration(labelText: "Phone"),
+                        decoration: InputDecoration(labelText: "Experience"),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(labelText: "Email"),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _experienceController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: "Experience"),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: _selectedGender,
-                  items: [
-                    DropdownMenuItem(value: 'Male', child: Text("Male")),
-                    DropdownMenuItem(value: 'Female', child: Text("Female")),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGender = value!;
-                    });
-                  },
-                  decoration: InputDecoration(labelText: "Gender"),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _addressController,
-                  decoration: InputDecoration(
-                    labelText: "Address",
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.location_on),
-                      onPressed: _getCurrentLocation,
-                    ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: _selectedGender,
+                        items: [
+                          DropdownMenuItem(value: 'Male', child: Text("Male")),
+                          DropdownMenuItem(
+                              value: 'Female', child: Text("Female")),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedGender = value!;
+                          });
+                        },
+                        decoration: InputDecoration(labelText: "Gender"),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _addressController,
+                        decoration: InputDecoration(
+                          labelText: "Address",
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.location_on),
+                            onPressed: _getCurrentLocation,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _userAddressController,
+                        decoration: InputDecoration(labelText: "User Address"),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _ageController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(labelText: "Age"),
+                      ),
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _saveProfile,
+                          child: Text("Save Changes"),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: TextButton(
+                          onPressed: _showChangePasswordDialog,
+                          child: Text("Change Password"),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _userAddressController,
-                  decoration: InputDecoration(labelText: "User Address"),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _ageController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: "Age"),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saveProfile,
-                    child: Text("Save Changes"),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: TextButton(
-                    onPressed: _showChangePasswordDialog,
-                    child: Text("Change Password"),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

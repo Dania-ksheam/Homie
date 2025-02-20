@@ -10,7 +10,7 @@
 //   const VendorOffersScreen({required this.missionId, Key? key}) : super(key: key);
 
 //   Future<List<VendorOffer>> fetchVendorOffers() async {
-//     final response = await http.get(Uri.parse('https://192.168.0.109:7127/api/VendorOffer?missionId=$missionId'));
+//     final response = await http.get(Uri.parse('${AppConfig.baseUrl}:7127/api/VendorOffer?missionId=$missionId'));
 
 //     if (response.statusCode == 200) {
 //       final List<dynamic> data = json.decode(response.body);

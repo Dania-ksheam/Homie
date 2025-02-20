@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +14,7 @@ import 'package:location/location.dart' as loc;
 
 import '../theme.dart';
 import 'login_screen.dart';
+import '../config.dart';
 
 // Define the GenderType enum
 enum GenderType { male, female }
@@ -131,19 +133,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _avatarImage = File(pickedFile.path); // Store the full path for file operations
-        _avatarFileName = path.basename(pickedFile.path); // Extract and store the file name
-        _base64Image = base64Encode(_avatarImage!.readAsBytesSync()); // Convert image to Base64 string
+        _avatarImage =
+            File(pickedFile.path); // Store the full path for file operations
+        _avatarFileName =
+            path.basename(pickedFile.path); // Extract and store the file name
+        _base64Image = base64Encode(
+            _avatarImage!.readAsBytesSync()); // Convert image to Base64 string
       });
     }
   }
 
   void _fetchCategories() async {
     try {
-      final response = await http.get(Uri.parse('https://192.168.0.109:7127/api/Category'));
+      final response =
+          await http.get(Uri.parse('${AppConfig.baseUrl}:7127/api/Category'));
       print(response.statusCode); // Log the response status code
       if (response.statusCode == 200 || response.statusCode == 201) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -156,7 +163,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               };
             }).toList();
             if (_categories.isNotEmpty) {
-              _selectedCategory = _categories[0]; // Set the first category as the default
+              _selectedCategory =
+                  _categories[0]; // Set the first category as the default
             }
           });
         }
@@ -199,7 +207,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       try {
         final response = await http.post(
-          Uri.parse('https://192.168.0.109:7127/api/user'),
+          Uri.parse('${AppConfig.baseUrl}:7127/api/user'),
           headers: {
             'Content-Type': 'application/json',
           },
@@ -212,9 +220,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
           if (widget.userType == 1) {
             // Fetch the user by email to get the user ID using the filter endpoint
-            final userResponse = await http.get(
-              Uri.parse('https://192.168.0.109:7127/api/user/filter?email=${_emailController.text}')
-            );
+            final userResponse = await http.get(Uri.parse(
+                '${AppConfig.baseUrl}:7127/api/user/filter?email=${_emailController.text}'));
 
             if (userResponse.statusCode == 200) {
               final filteredUsers = jsonDecode(userResponse.body);
@@ -223,7 +230,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 final userId = fetchedUser['id'];
 
                 final Map<String, dynamic> vendorData = {
-                  'userId': userId,  // Use fetched user ID
+                  'userId': userId, // Use fetched user ID
                   'categoryId': _selectedCategory != null
                       ? _selectedCategory!['id']
                       : null,
@@ -232,7 +239,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 };
 
                 final vendorResponse = await http.post(
-                  Uri.parse('https://192.168.0.109:7127/api/VenderProfile'),
+                  Uri.parse('${AppConfig.baseUrl}:7127/api/VenderProfile'),
                   headers: {
                     'Content-Type': 'application/json',
                   },
@@ -245,15 +252,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   );
                   Navigator.pop(context);
                 } else {
-                  _showErrorDialog("Error", "Vendor profile creation error: ${vendorResponse.body}");
-                  print("Vendor profile creation error: ${vendorResponse.body}");
+                  _showErrorDialog("Error",
+                      "Vendor profile creation error: ${vendorResponse.body}");
+                  print(
+                      "Vendor profile creation error: ${vendorResponse.body}");
                 }
               } else {
                 _showErrorDialog("Error", "User not found by email");
                 print("User not found by email: ${userResponse.body}");
               }
             } else {
-              _showErrorDialog("Error", "Error fetching user by email: ${userResponse.body}");
+              _showErrorDialog("Error",
+                  "Error fetching user by email: ${userResponse.body}");
               print("Error fetching user by email: ${userResponse.body}");
             }
           } else {
@@ -315,10 +325,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.rectangle,
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0), // Add border radius
+                          borderRadius:
+                              BorderRadius.circular(8.0), // Add border radius
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
+                          icon: const Icon(Icons.arrow_back,
+                              color: AppColors.primaryColor),
                           onPressed: () {
                             Navigator.pop(context);
                           },
@@ -328,7 +340,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.037),
-                Text("Sign up",
+                Text(
+                  "Sign up",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
@@ -336,7 +349,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-
                 Text(
                   widget.userType == 1
                       ? "As a service provider you can offer your services and get paid for them"
@@ -348,7 +360,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.07),
-
                 GestureDetector(
                   onTap: _pickImage,
                   child: CircleAvatar(
@@ -364,14 +375,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 _buildTextFormField(
                   controller: _nameController,
                   labelText: 'Name',
-                  validator: (value) => value == null || value.isEmpty ? 'Enter your name' : null, maxLength: 30,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Enter your name' : null,
+                  maxLength: 30,
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-
                 _buildEmailFormField(
                   controller: _emailController,
                   labelText: 'Email',
-                  validator: (value) => value == null || !value.contains('@') ? 'Enter a valid email' : null,
+                  validator: (value) => value == null || !value.contains('@')
+                      ? 'Enter a valid email'
+                      : null,
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                 _buildPasswordFormField(
@@ -383,7 +397,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       _obscurePassword = !_obscurePassword;
                     });
                   },
-                  validator: (value) => value == null || value.length < 6 || !RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$').hasMatch(value) ? 'Password must be at least 6 characters, and contain both letters and numbers' : null,
+                  validator: (value) => value == null ||
+                          value.length < 6 ||
+                          !RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$')
+                              .hasMatch(value)
+                      ? 'Password must be at least 6 characters, and contain both letters and numbers'
+                      : null,
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                 Text(
@@ -403,7 +422,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       _obscureConfirmPassword = !_obscureConfirmPassword;
                     });
                   },
-                  validator: (value) => value != _passwordController.text ? 'Passwords do not match' : null,
+                  validator: (value) => value != _passwordController.text
+                      ? 'Passwords do not match'
+                      : null,
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                 _buildTextFormField(
@@ -419,7 +440,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       return 'Age must be above 16';
                     }
                     return null;
-                  }, maxLength: 3,
+                  },
+                  maxLength: 3,
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                 _buildGenderSelection(),
@@ -427,7 +449,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 _buildPhoneNumberField(),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                 _buildDropdownButtonFormField(
-                  value: _addressController.text.isEmpty ? null : _addressController.text,
+                  value: _addressController.text.isEmpty
+                      ? null
+                      : _addressController.text,
                   labelText: 'Address',
                   items: _tripoliStreets
                       .map<DropdownMenuItem<String>>(
@@ -442,7 +466,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       _addressController.text = value!;
                     });
                   },
-                  validator: (value) => value == null || value.isEmpty ? 'Select your address' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Select your address'
+                      : null,
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                 Row(
@@ -472,12 +498,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onPressed: _isLoading ? null : submitForm,
                     child: _isLoading
                         ? CircularProgressIndicator(color: Colors.white)
-                        : Text('Sign Up'
-                        ,style: TextStyle(
-                          fontSize: 18,
-
-                        )
-                    ),
+                        : Text('Sign Up',
+                            style: TextStyle(
+                              fontSize: 18,
+                            )),
                   ),
                 ),
               ],
@@ -495,17 +519,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
     TextInputType keyboardType = TextInputType.text,
     required String? Function(String?) validator,
     int? maxLines,
+    bool isNumbersOnly = false, // Add this parameter
   }) {
     return TextFormField(
       controller: controller,
       maxLength: maxLength,
-      decoration: InputDecoration(labelText: labelText,
+      decoration: InputDecoration(
+        labelText: labelText,
         alignLabelWithHint: true,
-
       ),
       keyboardType: keyboardType,
       validator: validator,
       maxLines: maxLines,
+      inputFormatters: isNumbersOnly
+          ? [FilteringTextInputFormatter.digitsOnly]
+          : [], // Add this line
     );
   }
 
@@ -595,6 +623,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ],
     );
   }
+
   Widget _buildPhoneNumberField() {
     return Row(
       children: [
@@ -630,17 +659,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       children: [
         _buildTextFormField(
-          controller: _bioController,
-          labelText: 'Bio',
-          validator: (value) => null, maxLength: 250,
-          maxLines: 5
-        ),
+            controller: _bioController,
+            labelText: 'Bio',
+            validator: (value) => null,
+            maxLength: 250,
+            maxLines: 5),
         SizedBox(height: MediaQuery.of(context).size.height * 0.03),
         _buildTextFormField(
-          controller: _experienceController,
-          labelText: 'Experience (years)',
-          validator: (value) => null, maxLength: 2,
-        ),
+            controller: _experienceController,
+            labelText: 'Experience (years)',
+            validator: (value) => null,
+            maxLength: 2,
+            isNumbersOnly: true),
         SizedBox(height: MediaQuery.of(context).size.height * 0.03),
         DropdownButtonFormField<Map<String, dynamic>>(
           value: _selectedCategory,

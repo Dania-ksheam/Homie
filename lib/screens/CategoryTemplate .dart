@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config.dart';
 
 void main() => runApp(MyApp());
 
@@ -33,7 +33,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   // Fetch data from the API
   Future<List<Category>> fetchCategories() async {
     final response =
-        await http.get(Uri.parse('https://192.168.0.109:7127/api/Category'));
+        await http.get(Uri.parse('${AppConfig.baseUrl}:7127/api/Category'));
     print('Raw response: ${response.body}');
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
@@ -110,7 +110,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                   MaterialPageRoute(
                                     builder: (context) => MissionTemplateScreen(
                                       categoryId: category.id,
-                                      fields: categoryTemplates[category.id] ?? [],
+                                      fields:
+                                          categoryTemplates[category.id] ?? [],
                                     ),
                                   ),
                                 );

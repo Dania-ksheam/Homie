@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../theme.dart';
 import '../widgets/image_base.dart';
 import 'vendor_details_screen.dart';
+import '../config.dart';
 
 class OrdersScreen extends StatefulWidget {
   final String userId;
@@ -15,7 +15,7 @@ class OrdersScreen extends StatefulWidget {
   State<OrdersScreen> createState() => _OrdersScreenState();
 }
 
-class _OrdersScreenState extends State<OrdersScreen> 
+class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final Future<List<Mission>> _missionsFuture;
@@ -29,7 +29,7 @@ class _OrdersScreenState extends State<OrdersScreen>
 
   Future<List<Mission>> _fetchMissions() async {
     final response = await http.get(Uri.parse(
-      'https://192.168.0.109:7127/api/Mission/Filter?userId=${widget.userId}',
+      '${AppConfig.baseUrl}:7127/api/Mission/Filter?userId=${widget.userId}',
     ));
 
     if (response.statusCode == 200) {
@@ -46,22 +46,22 @@ class _OrdersScreenState extends State<OrdersScreen>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.backgroundColor,
-        title: Text('User Missions',
-        style: TextStyle(
-          color: AppColors.primaryColor
-        ),
+        title: Text(
+          'User Missions',
+          style: TextStyle(color: AppColors.primaryColor),
         ),
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.backgroundColor,
           unselectedLabelColor: AppColors.textPrimaryColor,
           indicator: BoxDecoration(
-            color: AppColors.primaryColor, // Background color of the selected tab
-            borderRadius: BorderRadius.circular(2), // Optional: Add rounded corners to the indicator
+            color:
+                AppColors.primaryColor, // Background color of the selected tab
+            borderRadius: BorderRadius.circular(
+                2), // Optional: Add rounded corners to the indicator
           ),
           indicatorSize: TabBarIndicatorSize.tab,
-          tabs: const
-          [
+          tabs: const [
             Tab(text: 'All Missions'),
             Tab(text: 'Scheduled Missions'),
           ],
@@ -82,9 +82,8 @@ class _OrdersScreenState extends State<OrdersScreen>
             return const Center(child: Text('No missions yet'));
           }
 
-          final scheduled = missions.where(
-            (m) => m.state == MissionState.Scheduled
-          ).toList();
+          final scheduled =
+              missions.where((m) => m.state == MissionState.Scheduled).toList();
 
           return TabBarView(
             controller: _tabController,
@@ -146,12 +145,10 @@ class MissionCard extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: _buildMissionImage(),
-        title: Text(mission.name,
-        style: TextStyle(
-          color: AppColors.primaryColor,
-          fontWeight: FontWeight.bold
-
-        ),
+        title: Text(
+          mission.name,
+          style: TextStyle(
+              color: AppColors.primaryColor, fontWeight: FontWeight.bold),
         ),
         subtitle: Text('Location: ${mission.location}'),
         trailing: Container(
@@ -163,7 +160,8 @@ class MissionCard extends StatelessWidget {
               width: 2.0, // Border width
             ),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6), // Padding inside the pill
+          padding: EdgeInsets.symmetric(
+              horizontal: 12, vertical: 6), // Padding inside the pill
           child: Text(
             mission.state.name,
             style: TextStyle(
@@ -178,7 +176,10 @@ class MissionCard extends StatelessWidget {
   Widget _buildMissionImage() {
     return mission.image != null
         ? Image.network(mission.image!, width: 50, height: 50)
-        : const Icon(Icons.work,color: AppColors.primaryColor,);
+        : const Icon(
+            Icons.work,
+            color: AppColors.primaryColor,
+          );
   }
 }
 
@@ -209,7 +210,7 @@ class _VendorOffersScreenState extends State<VendorOffersScreen> {
   Future<List<VendorOffer>> _fetchOffers() async {
     try {
       final response = await http.get(Uri.parse(
-        'https://192.168.0.109:7127/api/VendorOffer/Filter?missionId=${widget.missionId}',
+        '${AppConfig.baseUrl}:7127/api/VendorOffer/Filter?missionId=${widget.missionId}',
       ));
 
       if (response.statusCode != 200) return [];
@@ -224,7 +225,7 @@ class _VendorOffersScreenState extends State<VendorOffersScreen> {
 
   Future<List<VendorOffer>> _processOfferData(List<dynamic> data) async {
     final List<VendorOffer> offers = [];
-    
+
     for (final item in data) {
       try {
         var offer = VendorOffer.fromJson(item);
@@ -240,7 +241,7 @@ class _VendorOffersScreenState extends State<VendorOffersScreen> {
   Future<VendorOffer> _enhanceOfferWithProfileData(VendorOffer offer) async {
     try {
       final profileResponse = await http.get(Uri.parse(
-        'https://192.168.0.109:7127/api/VenderProfile/${offer.venderProfileId}',
+        '${AppConfig.baseUrl}:7127/api/VenderProfile/${offer.venderProfileId}',
       ));
 
       if (profileResponse.statusCode != 200) return offer;
@@ -249,9 +250,8 @@ class _VendorOffersScreenState extends State<VendorOffersScreen> {
       final userId = profile['userId']?.toString();
       if (userId == null) return offer;
 
-      final userResponse = await http.get(Uri.parse(
-        'https://192.168.0.109:7127/api/User/$userId'
-      ));
+      final userResponse = await http
+          .get(Uri.parse('${AppConfig.baseUrl}:7127/api/User/$userId'));
 
       if (userResponse.statusCode != 200) return offer;
 
@@ -280,8 +280,7 @@ class _VendorOffersScreenState extends State<VendorOffersScreen> {
     try {
       final response = await http.put(
         Uri.parse(
-          'https://192.168.0.109:7127/api/VendorOffer/ChangeStateToAccepted/$offerId'
-        ),
+            '${AppConfig.baseUrl}:7127/api/VendorOffer/ChangeStateToAccepted/$offerId'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'state': true}),
       );
@@ -309,17 +308,18 @@ class _VendorOffersScreenState extends State<VendorOffersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: AppColors.backgroundColor,
-          title: const Text('Vendor Offers',
-        style: TextStyle(
-            color: AppColors.primaryColor
-        ),)
-         ,leading: IconButton(
-      icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    ),      ),
+        backgroundColor: AppColors.backgroundColor,
+        title: const Text(
+          'Vendor Offers',
+          style: TextStyle(color: AppColors.primaryColor),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: FutureBuilder<List<VendorOffer>>(
         future: _offersFuture,
         builder: (context, snapshot) {
@@ -395,17 +395,19 @@ class OfferCard extends StatelessWidget {
   Widget _buildVendorHeader() {
     return Row(
       children: [
-      CircleAvatar(
-      radius: 25,
-      backgroundImage: offer.vendorImage != null && !offer.vendorImage!.startsWith('data:image')
-          ? NetworkImage(offer.vendorImage!)
-          : null,
-      child: offer.vendorImage != null && offer.vendorImage!.startsWith('data:image')
-          ? ImageFromBase64(base64String: offer.vendorImage!.split(',')[1])
-          : offer.vendorImage == null
-          ? const Icon(Icons.person)
-          : null,
-    ),
+        CircleAvatar(
+          radius: 25,
+          backgroundImage: offer.vendorImage != null &&
+                  !offer.vendorImage!.startsWith('data:image')
+              ? NetworkImage(offer.vendorImage!)
+              : null,
+          child: offer.vendorImage != null &&
+                  offer.vendorImage!.startsWith('data:image')
+              ? ImageFromBase64(base64String: offer.vendorImage!.split(',')[1])
+              : offer.vendorImage == null
+                  ? const Icon(Icons.person)
+                  : null,
+        ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
@@ -419,8 +421,7 @@ class OfferCard extends StatelessWidget {
             ],
           ),
         ),
-        Text('LYD ${offer.price.toStringAsFixed(2)}'
-        ),
+        Text('LYD ${offer.price.toStringAsFixed(2)}'),
       ],
     );
   }
@@ -485,13 +486,13 @@ class Mission {
   });
 
   factory Mission.fromJson(Map<String, dynamic> json) => Mission(
-    id: json['id'],
-    name: json['name'],
-    state: MissionState.values[json['state']],
-    day: DateTime.parse(json['day']),
-    location: json['location'],
-    image: json['image'],
-  );
+        id: json['id'],
+        name: json['name'],
+        state: MissionState.values[json['state']],
+        day: DateTime.parse(json['day']),
+        location: json['location'],
+        image: json['image'],
+      );
 }
 
 enum MissionState { Pending, Scheduled, Completed, Cancelled }
@@ -534,13 +535,13 @@ class VendorOffer {
   });
 
   factory VendorOffer.fromJson(Map<String, dynamic> json) => VendorOffer(
-    id: json['Id'] ?? '',
-    venderProfileId: json['VenderProfileId'] ?? '',
-    missionId: json['MissionId'] ?? '',
-    note: json['Note'],
-    price: (json['Price'] as num?)?.toDouble() ?? 0.0,
-    state: json['State'] ?? false,
-  );
+        id: json['Id'] ?? '',
+        venderProfileId: json['VenderProfileId'] ?? '',
+        missionId: json['MissionId'] ?? '',
+        note: json['Note'],
+        price: (json['Price'] as num?)?.toDouble() ?? 0.0,
+        state: json['State'] ?? false,
+      );
 
   VendorOffer copyWith({
     String? vendorName,
