@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -519,7 +518,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     TextInputType keyboardType = TextInputType.text,
     required String? Function(String?) validator,
     int? maxLines,
-    bool isNumbersOnly = false, // Add this parameter
   }) {
     return TextFormField(
       controller: controller,
@@ -531,9 +529,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       keyboardType: keyboardType,
       validator: validator,
       maxLines: maxLines,
-      inputFormatters: isNumbersOnly
-          ? [FilteringTextInputFormatter.digitsOnly]
-          : [], // Add this line
     );
   }
 
@@ -666,11 +661,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             maxLines: 5),
         SizedBox(height: MediaQuery.of(context).size.height * 0.03),
         _buildTextFormField(
-            controller: _experienceController,
-            labelText: 'Experience (years)',
-            validator: (value) => null,
-            maxLength: 2,
-            isNumbersOnly: true),
+          controller: _experienceController,
+          labelText: 'Experience (years)',
+          validator: (value) => null,
+          maxLength: 2,
+        ),
         SizedBox(height: MediaQuery.of(context).size.height * 0.03),
         DropdownButtonFormField<Map<String, dynamic>>(
           value: _selectedCategory,

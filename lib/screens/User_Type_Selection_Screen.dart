@@ -56,7 +56,7 @@ class UserTypeSelectionScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-             Spacer(),
+            Spacer(),
             // Client Button
             SizedBox(
               width: double.infinity,
@@ -69,41 +69,41 @@ class UserTypeSelectionScreen extends StatelessWidget {
                       builder: (context) => SignUpScreen(userType: 0),
                     ),);},
                 child: Text("I am a Client",style: TextStyle(
-                      fontSize: 18,  ),), // Removed localization
-                      ),),
-SizedBox(
-  height: MediaQuery.of(context).size.height * 0.02,
-),     // Service Provider
- SizedBox(
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.08,
-        child: OutlinedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SignUpScreen(userType: 1),
+                  fontSize: 18,  ),), // Removed localization
+              ),),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.02,
+            ),     // Service Provider
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.08,
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SignUpScreen(userType: 1),
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppColors.primaryColor, width: 2.0), // Add border
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0), // Set corner radius
+                  ),
+                ),
+                child:
+
+                Text("I am a Service Provider"
+                    ,style: TextStyle(
+                      fontSize: 18,
+
+                    )
+                ), // Removed localization
+
+
               ),
-            );
-          },
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(color: AppColors.primaryColor, width: 2.0), // Add border
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0), // Set corner radius
             ),
-          ),
-          child:
-
-              Text("I am a Service Provider"
-              ,style: TextStyle(
-                    fontSize: 18,
-
-                  )
-              ), // Removed localization
-
-
-        ),
-      ),
             Spacer()
           ],
         ),

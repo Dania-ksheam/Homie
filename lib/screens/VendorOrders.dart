@@ -24,7 +24,6 @@ class Mission {
   final String? image;
   final int? room;
   final DateTime? day;
-  final bool hasOffer;
 
   Mission({
     required this.id,
@@ -43,14 +42,13 @@ class Mission {
     this.image,
     this.room,
     this.day,
-    required this.hasOffer,
   });
 
   factory Mission.fromJson(Map<String, dynamic> json) {
     return Mission(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      state: json['state'].toString(),
+      state: json['state'].toString(), // Convert enum to string
       userId: json['userId'] ?? '',
       categoryId: json['categoryId'] ?? '',
       location: json['location'],
@@ -64,7 +62,6 @@ class Mission {
       image: json['image'],
       room: json['room'],
       day: json['day'] != null ? DateTime.parse(json['day']) : null,
-      hasOffer: json['hasoffer'] ?? false, // Ensure hasOffer is not null
     );
   }
 
@@ -72,7 +69,6 @@ class Mission {
     String? userName,
     String? userEmail,
     String? userImage,
-    bool? hasOffer,
   }) {
     return Mission(
       id: this.id,
@@ -91,7 +87,6 @@ class Mission {
       image: this.image,
       room: this.room,
       day: this.day,
-      hasOffer: hasOffer ?? this.hasOffer,
     );
   }
 }
@@ -392,22 +387,12 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   Mission? mission;
-  bool _isOfferSubmitted = false;
-  bool _isOfferButtonActive = true; // Add this state variable
+  bool hasOffer = false;
 
   @override
   void initState() {
     super.initState();
     fetchMissionDetails();
-    _noteController.addListener(_validateFields);
-    _priceController.addListener(_validateFields);
-  }
-
-  void _validateFields() {
-    setState(() {
-      _isOfferButtonActive =
-          _noteController.text.isNotEmpty && _priceController.text.isNotEmpty;
-    });
   }
 
   Future<void> fetchMissionDetails() async {
@@ -416,6 +401,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
 
     try {
       final response = await http.get(Uri.parse(missionUrl));
+
       print(
           'Fetch mission details response status code: ${response.statusCode}');
       print('Fetch mission details response body: ${response.body}');
@@ -424,7 +410,9 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
         final missionData = json.decode(response.body);
         setState(() {
           mission = Mission.fromJson(missionData);
+          hasOffer = missionData['hasoffer'] ?? false;
         });
+        print('Mission details fetched successfully: $mission');
       } else {
         throw Exception('Failed to load mission details');
       }
@@ -434,20 +422,40 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
   }
 
   Future<void> _submitOffer() async {
+    if (hasOffer==true) {
+      _showOfferDialog();
+      return;
+    }
+
     if (widget.missionId.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: missionId is empty')));
+      _showErrorDialog('Error: missionId is empty');
+      return;
+    }
+
+    if (_priceController.text.isEmpty) {
+      _showErrorDialog('Error: Price is empty');
+      return;
+    }
+
+    double? price;
+    try {
+      price = double.parse(_priceController.text);
+    } catch (e) {
+      _showErrorDialog('Error: Invalid price format');
       return;
     }
 
     final url = '${AppConfig.baseUrl}:7127/api/vendorOffer';
     final body = json.encode({
-      'venderProfileId': widget.vendorId,
+      'venderProfileId': widget.vendorId, // Use vendorId here
       'missionId': widget.missionId,
       'note': _noteController.text,
-      'price': double.parse(_priceController.text),
-      'state': false,
+      'price': price,
+      'state': false, // Assuming 'false' means not accepted
     });
+
+    print('Submitting offer with missionId: ${widget.missionId}');
+    print('Request body: $body');
 
     try {
       final response = await http.post(
@@ -458,37 +466,74 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
         body: body,
       );
 
-      print('Submit offer response status code: ${response.statusCode}');
-      print('Submit offer response body: ${response.body}');
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-        setState(() {
-          _isOfferSubmitted = true;
-          mission =
-              mission!.copyWith(hasOffer: true); // Update local mission object
-        });
+        // Successfully posted
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Offer submitted successfully')));
       } else {
+        // Error handling
         final responseBody = json.decode(response.body);
-        if (responseBody ==
-            'An offer already exists for this mission and vendor.') {
-          setState(() {
-            _isOfferButtonActive = false; // Disable the button
-          });
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                  'You already put an offer. Wait for the user to accept it.')));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Failed to submit offer: ${responseBody}')));
-        }
+        _showErrorDialog('Failed to submit offer: ${responseBody}');
       }
     } catch (e) {
-      print('Error submitting offer: $e');
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('An error occurred: $e')));
+      // Exception handling
+      _showErrorDialog('An error occurred: $e');
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOfferDialog() {
+    showDialog(
+      context: context,
+      builder: (context) =>
+        Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10.0,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Offer already exists",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 16.0),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        ),
+
+    );
   }
 
   Future<void> _changeStateToComplete() async {
@@ -496,6 +541,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
         '${AppConfig.baseUrl}:7127/api/ChangeStateToComplete/${widget.missionId}';
 
     try {
+      print('Changing state to complete for missionId: ${widget.missionId}');
       final response = await http.put(
         Uri.parse(url),
         headers: {
@@ -503,15 +549,28 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
         },
       );
 
+      print('Change state response status code: ${response.statusCode}');
+      print('Change state response body: ${response.body}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Mission state changed to completed')));
       } else {
-        final responseBody = json.decode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Failed to change mission state: ${responseBody}')));
+        if (response.body.isNotEmpty) {
+          final responseBody = json.decode(response.body);
+          print('Failed to change mission state: ${responseBody}');
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content:
+              Text('Failed to change mission state: ${responseBody}')));
+        } else {
+          print('Failed to change mission state: Empty response body');
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content:
+              Text('Failed to change mission state: Empty response body')));
+        }
       }
     } catch (e) {
+      print('Error changing mission state: $e');
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('An error occurred: $e')));
     }
@@ -519,6 +578,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('Mission ID in detail screen: ${widget.missionId}');
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -540,126 +600,113 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       body: mission == null
           ? Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Mission Name: ${mission!.name}',
+                style:
+                TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text('State: ${getStateText(mission!.state)}'),
+              if (mission!.location != null) SizedBox(height: 10),
+              if (mission!.location != null)
+                Row(
                   children: [
-                    Text(
-                      'Mission Name: ${mission!.name}',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    Text('Location: '),
+                    InkWell(
+                      onTap: () async {
+                        final url =
+                            'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(mission!.location!)}';
+                        if (await canLaunch(url)) {
+                          await launch(url);
+                        } else {
+                          throw 'Could not launch $url';
+                        }
+                      },
+                      child: Text(
+                        mission!.location!,
+                        style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
-                    SizedBox(height: 10),
-                    Text('State: ${getStateText(mission!.state)}'),
-                    if (mission!.location != null) SizedBox(height: 10),
-                    if (mission!.location != null)
-                      Row(
-                        children: [
-                          Text('Location: '),
-                          InkWell(
-                            onTap: () async {
-                              final url =
-                                  'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(mission!.location!)}';
-                              if (await canLaunch(url)) {
-                                await launch(url);
-                              } else {
-                                throw 'Could not launch $url';
-                              }
-                            },
-                            child: Text(
-                              mission!.location!,
-                              style: TextStyle(
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    if (mission!.grade != null) SizedBox(height: 10),
-                    if (mission!.grade != null)
-                      Text('Grade: ${mission!.grade}'),
-                    if (mission!.details != null) SizedBox(height: 10),
-                    if (mission!.details != null)
-                      Text('Details: ${mission!.details}'),
-                    if (mission!.hours != null) SizedBox(height: 10),
-                    if (mission!.hours != null)
-                      Text('Hours: ${mission!.hours}'),
-                    if (mission!.note != null) SizedBox(height: 10),
-                    if (mission!.note != null) Text('Note: ${mission!.note}'),
-                    if (mission!.room != null) SizedBox(height: 10),
-                    if (mission!.room != null) Text('Room: ${mission!.room}'),
-                    if (mission!.day != null) SizedBox(height: 10),
-                    if (mission!.day != null)
-                      Text(
-                          'Day: ${mission!.day!.toLocal().toString().split(' ')[0]}'),
-                    SizedBox(height: 20),
-                    if (mission!.state == '0' && !mission!.hasOffer) ...[
-                      TextField(
-                        controller: _priceController,
-                        maxLength: 8,
-                        decoration: InputDecoration(
-                          labelText: 'Price',
-                          suffixText: 'LYD ',
-                        ),
-                        keyboardType: TextInputType.number,
-                      ),
-                      if (_priceController.text.isEmpty)
-                        Text(
-                          'You need to fill this field first',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      SizedBox(height: 10),
-                      TextField(
-                        controller: _noteController,
-                        decoration: InputDecoration(
-                          labelText: 'Add Note',
-                          alignLabelWithHint: true,
-                        ),
-                        maxLines: 5,
-                      ),
-                      if (_noteController.text.isEmpty)
-                        Text(
-                          'You need to fill this field first',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        child: ElevatedButton(
-                          onPressed: _isOfferButtonActive
-                              ? _submitOffer
-                              : null, // Disable the button if _isOfferButtonActive is false
-                          child: Text(
-                            'Send',
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                    if (mission!.state == '1') ...[
-                      SizedBox(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        child: ElevatedButton(
-                          onPressed: _changeStateToComplete,
-                          child: Text(
-                            'Mark as Complete',
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
-              ),
-            ),
+              if (mission!.grade != null) SizedBox(height: 10),
+              if (mission!.grade != null)
+                Text('Grade: ${mission!.grade}'),
+              if (mission!.details != null) SizedBox(height: 10),
+              if (mission!.details != null)
+                Text('Details: ${mission!.details}'),
+              if (mission!.hours != null) SizedBox(height: 10),
+              if (mission!.hours != null)
+                Text('Hours: ${mission!.hours}'),
+              if (mission!.note != null) SizedBox(height: 10),
+              if (mission!.note != null) Text('Note: ${mission!.note}'),
+              if (mission!.room != null) SizedBox(height: 10),
+              if (mission!.room != null) Text('Room: ${mission!.room}'),
+              if (mission!.day != null) SizedBox(height: 10),
+              if (mission!.day != null)
+                Text(
+                    'Day: ${mission!.day!.toLocal().toString().split(' ')[0]}'),
+              SizedBox(height: 20),
+              if (mission!.state == '0' && !hasOffer) ...[
+                TextField(
+                  controller: _priceController,
+                  decoration: InputDecoration(
+                    labelText: 'Price',
+                    suffixText: 'LYD ',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _noteController,
+                  decoration: InputDecoration(
+                    labelText: 'Add Note',
+                    alignLabelWithHint: true,
+                  ),
+                  maxLines: 5,
+                ),
+                SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  child: ElevatedButton(
+                    onPressed: _submitOffer,
+                    child: Text(
+                      'Send',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              if (mission!.state == '1') ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  child: ElevatedButton(
+                    onPressed: _changeStateToComplete,
+                    child: Text(
+                      'Mark as Complete',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

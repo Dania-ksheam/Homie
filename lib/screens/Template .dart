@@ -8,8 +8,23 @@ import '../config.dart';
 
 // Define a map to hold the configuration for each category
 final Map<String, List<String>> categoryFieldConfig = {
-  'Plumping/سباكه': ['Date', 'Time', 'Location', 'Details', 'Note', 'Image'],
-  'Cleaning | التنظيف': ['Date', 'Location', 'Details', 'Hour', 'Note'],
+  'Plumping |سباكه': [
+    'Date',
+    'Time',
+    'Location',
+    'Details',
+    'Note',
+    'Image',
+    'Room'
+  ],
+  'Cleaning | التنظيف': [
+    'Date',
+    'Time',
+    'Location',
+    'Details',
+    'Note',
+    'Hours'
+  ],
   'Electrical Services | الخدمات الكهربائية': [
     'Date',
     'Time',
@@ -26,7 +41,7 @@ final Map<String, List<String>> categoryFieldConfig = {
     'Image',
     'Note'
   ],
-  'teaching/تدريس': ['Date', 'Time', 'Location', 'Details', 'Image', 'Note'],
+  'Teaching | تدريس': ['Date', 'Time', 'Location', 'Details', 'Grade', 'Hours', 'Image', 'Note'],
   // Add more categories as needed
 };
 
@@ -90,10 +105,10 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
       }
 
       final PermissionStatus permissionGranted =
-          await _location.hasPermission();
+      await _location.hasPermission();
       if (permissionGranted == PermissionStatus.denied) {
         final PermissionStatus requestedPermission =
-            await _location.requestPermission();
+        await _location.requestPermission();
         if (requestedPermission != PermissionStatus.granted) {
           setState(() {
             _isFetchingLocation = false;
@@ -105,7 +120,7 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
       final locationData = await _location.getLocation();
       setState(() {
         _currentLocation =
-            '${locationData.latitude}, ${locationData.longitude}';
+        '${locationData.latitude}, ${locationData.longitude}';
         _isFetchingLocation = false;
       });
     } catch (e) {
@@ -162,7 +177,7 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
       'Note': _note, // Add note field
       'Hours': _selectedHours?.toString(), // Convert Hours to string
       'Mission':
-          'mission details', // Ensure the mission field is included (Replace with actual mission details)
+      'mission details', // Ensure the mission field is included (Replace with actual mission details)
     };
 
     // Ensure all fields are included and set to null if not chosen
@@ -195,12 +210,10 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
     if (response.statusCode == 201 || response.statusCode == 200) {
       print('Form submitted successfully!');
       // Show popup message
-      print('Form submitted successfully!');
-      // Show popup message
       showDialog(
         context: context,
         barrierDismissible:
-            false, // Prevent closing the dialog by tapping outside
+        false, // Prevent closing the dialog by tapping outside
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Order Sent'),
@@ -279,14 +292,14 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
                         });
                       },
                       items: List.generate(
-                              24,
+                          24,
                               (index) =>
-                                  index +
-                                  1) // Generates a list of integers from 1 to 24
+                          index +
+                              1) // Generates a list of integers from 1 to 24
                           .map((hour) => DropdownMenuItem(
-                                value: hour,
-                                child: Text(hour.toString()),
-                              ))
+                        value: hour,
+                        child: Text(hour.toString()),
+                      ))
                           .toList(),
                     ),
                   ),
@@ -342,14 +355,14 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
                         setState(() {
                           _selectedEducationLevel = value;
                           _selectedGrade =
-                              null; // Reset grade when education level changes
+                          null; // Reset grade when education level changes
                         });
                       },
                       items: educationLevels
                           .map((level) => DropdownMenuItem(
-                                value: level,
-                                child: Text(level),
-                              ))
+                        value: level,
+                        child: Text(level),
+                      ))
                           .toList(),
                     ),
                   ),
@@ -376,9 +389,9 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
                       },
                       items: gradeRanges[_selectedEducationLevel]!
                           .map((grade) => DropdownMenuItem(
-                                value: grade,
-                                child: Text(grade.toString()),
-                              ))
+                        value: grade,
+                        child: Text(grade.toString()),
+                      ))
                           .toList(),
                     ),
                   ),
@@ -440,18 +453,18 @@ class _MissionTemplateScreenState extends State<MissionTemplateScreen> {
                     onTap: _pickImage,
                     child: _selectedImage != null
                         ? Image.file(
-                            _selectedImage!,
-                            height: 150,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          )
+                      _selectedImage!,
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
                         : Container(
-                            height: 150,
-                            width: double.infinity,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.camera_alt,
-                                size: 50, color: Colors.grey),
-                          ),
+                      height: 150,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.camera_alt,
+                          size: 50, color: Colors.grey),
+                    ),
                   ),
                 ],
               ),

@@ -22,10 +22,12 @@ dependencies:
   cached_network_image: ^3.2.3 # For efficient image caching
   flutter_svg: ^2.0.17
   url_launcher: ^6.3.1
+  flutter_bloc: ^8.0.0
   google_maps_flutter: ^2.10.0
   geolocator: ^13.0.2
   permission_handler: ^11.3.1
   http_parser: ^4.0.0
+  image: ^4.5.2
   #google_maps_flutter: ^2.0.9
   #google_maps_flutter: ^2.10.0
    # Add Google Maps Flutter package
